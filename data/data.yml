@@ -1,0 +1,45 @@
+nodes:
+  Armastus:
+    text: ARMASTUS
+    font: bold 30pt 'Open Sans'
+    height: 30
+    hPad: 20
+    wPad: 25
+    rectangle:
+      color: "#cc0000"
+      stroke:
+        width: 1
+        color: black
+
+  Inger:
+    text: Inger
+    click: &INGER_IISAK_CLICK
+      edges:
+        - source: Inger
+          target: Iisak
+          text: Armastavad, kuid ei näita seda eriti.
+        - source: Hobune
+          target: Inger
+          text: Hobune armastab ingerit
+        - source: Hobune
+          target: Iisak
+          text: Iisak armastab hobust
+      nodes:
+        - name: Hobune
+          text: Hobune
+          click:
+            edges:
+              - source: Sinu ema
+                target: Hobune
+                text: Nende vahel on intiimne suhe.
+            nodes:
+              - name: Sinu ema
+                text: Sinu ema
+  Iisak:
+    click: *INGER_IISAK_CLICK
+    text: Iisak
+
+edges:
+  Armastus:
+    Inger: {}
+    Iisak: {}
