@@ -1,3 +1,7 @@
+aliases:
+  child_color: &CHILD
+    rectangle:
+      color: "#aaccaa"
 nodes:
   Armastus:
     text: ARMASTUS
@@ -10,36 +14,97 @@ nodes:
       stroke:
         width: 1
         color: black
-
-  Inger:
-    text: Inger
-    click: &INGER_IISAK_CLICK
-      edges:
-        - source: Inger
-          target: Iisak
-          text: Armastavad, kuid ei näita seda eriti.
-        - source: Hobune
-          target: Inger
-          text: Hobune armastab ingerit
-        - source: Hobune
-          target: Iisak
-          text: Iisak armastab hobust
-      nodes:
-        - name: Hobune
-          text: Hobune
-          click:
-            edges:
-              - source: Sinu ema
-                target: Hobune
-                text: Nende vahel on intiimne suhe.
-            nodes:
-              - name: Sinu ema
-                text: Sinu ema
   Iisak:
-    click: *INGER_IISAK_CLICK
     text: Iisak
+    click:
+      edges:
+        Iisak:
+          Inger:
+            text: Armastavad, kuid ei näita seda eriti.
+            width: 7
+            color: red
+          Rebekka: {}
+          Siivert: {}
+          Eleseus: {}
+          Leopoldiine: {}
+          Geissler:
+            text: Geissler armastas Iisakut aidata.
+          Töö: {}
+          Talu: {}
+      nodes:
+        Inger:
+          click:
+            nodes:
+              Linnamood: {}
+              Gustav: {}
+              Leopoldiine:
+                << : *CHILD
+              Oliine: {}
+              Kolmas laps:
+                << : *CHILD
+            edges:
+              Inger:
+                Oliine:
+                  text: Väliselt riius, tegelikult on teineteisele vajalikud.
+                  #Inger vajab kedagi, kellele oma muresid kurta. Iisak pole selleks piisavalt emotsionaalne.
+                Eleseus: {}
+                Siivert: {}
+                Gustav: {}
+                Oliine: {}
+                Rebekka: {}
+                Leopoldiine: {}
+                Kolmas laps:
+                  text: Inger tappis ta, sest armastas teda.
+                  #Ei tahtnud tal lasta samasugust koledat elu elada
+                Linnamood:
+                  text: Peale vanglast vabanemist; hiljem vaibus.
+              Eleseus:
+                Linnamood: {}
+              Siivert:
+                Töö: {}
+
+        Eleseus:
+          << : *CHILD
+          click:
+            nodes:
+              Linn:{}
+            edges:
+              Eleseus:
+                Linn:
+                  text: Armastas linnas käia, kuid pettus.
+                Linnamood:
+                  text: Moodsalt riides käimine.
+        Siivert:
+          << : *CHILD
+          Eleseus: {}
+          Töö: {}
+        Leopoldiine:
+          << : *CHILD
+        Rebekka:
+          << : *CHILD
+        Geissler: {}
+        Töö: {}
+        Talu: {}
+
+  Aksel:
+    text: Aksel
+    click: &BARBRO_CLICK
+      edges:
+          Barbro:
+            Aksel: {}
+            Eleseus:
+              text: Esimene laps on Eleseuse oma?
+            Brede: {}
+      nodes:
+        Barbro: {}
+        Eleseus: {}
+
+  Brede:
+    text: Brede
+    click: *BARBRO_CLICK
 
 edges:
   Armastus:
-    Inger: {}
     Iisak: {}
+    Aksel: {}
+    Brede: {}

@@ -9,32 +9,13 @@ function merge_objects(base, override) {
         obj3[attrname] = base[attrname];
     }
     for (var attrname in override) {
-        if(typeof obj3[attrname] == "object" && typeof override[attrname] == "object") { //Recursive merge
+        if (typeof obj3[attrname] == "object" && typeof override[attrname] == "object") { //Recursive merge
             obj3[attrname] = merge_objects(obj3[attrname], override[attrname]);
             continue;
         }
         obj3[attrname] = override[attrname];
     }
     return obj3;
-}
-var canvas = document.getElementById('viewport');
-
-function shadeColor(color, percent) {
-
-    var col = arbor.colors.decode(color);
-    var R = col.r;
-    var G = col.g;
-    var B = col.b;
-
-    R = parseInt(R * (100 + percent) / 100);
-    G = parseInt(G * (100 + percent) / 100);
-    B = parseInt(B * (100 + percent) / 100);
-
-    R = (R < 255) ? R : 255;
-    G = (G < 255) ? G : 255;
-    B = (B < 255) ? B : 255;
-
-    return arbor.colors.encode({r: R, g: G, b: B});
 }
 
 (function ($) {
@@ -65,10 +46,10 @@ function shadeColor(color, percent) {
         };
 
         const defaultEdge = {
-            width: 1,
-            color: "rgba(0, 0, 0, 0.5)",
+            width: 3,
+            color: "rgba(0, 0, 0, 0.9)",
             length: 1,
-            text: "xd", //Description (string)
+            text: null, //Description (string)
             showText: false //Show description
         };
         var lastDoubleClick = null;
@@ -214,14 +195,16 @@ function shadeColor(color, percent) {
                 var data = node.data.click;
                 if (!data) return;
                 if (data.nodes) {
-                    data.nodes.forEach(function (e) {
+                    for (var k in data.nodes) {
+                        if (!data.nodes.hasOwnProperty(k)) continue;
+                        var e = data.nodes[k];
                         if (!e.node) return;
-                        if(!e.node.click)
+                        if (!e.node.click)
                             e.node.click = {};
                         e.node.click.toggled = false;
                         that.killChildren(e.node);
                         particleSystem.pruneNode(e.node);
-                    });
+                    }
                 }
             },
             initMouseHandling: function () {
@@ -246,31 +229,51 @@ function shadeColor(color, percent) {
                             if (nearest.distance > 100) return;
                             var data = nearest.node.data.click;
                             if (!data) return;
-                            if (data.nodes) {
-                                data.nodes.forEach(function (e) {
-                                    if (data.toggled) {
-                                        that.killChildren(e.node);
-                                        particleSystem.pruneNode(e.node);
-                                        if(!e.click)
-                                            e.click = {};
-                                        e.click.toggled = false;
-                                    } else {
-                                        var d = merge_objects(defaultNode, e);
-                                        d.x = nearest.node.p.x;
-                                        d.y = nearest.node.p.y;
-                                        e.node = particleSystem.addNode(e.name, d);
+                            if (!data.toggled) {
+                                particleSystem.graft(data);
+                                particleSystem.eachNode(function (no) {
+                                    if (!data.nodes) return;
+                                    if (data.nodes.hasOwnProperty(no)) {
+                                        no.text = no.name;
                                     }
                                 });
                             }
-                            if (data.edges) {
-                                data.edges.forEach(function (e) {
-                                    if (data.toggled)
-                                        particleSystem.pruneEdge(e.edge);
-                                    else {
-                                        var d = merge_objects(defaultEdge, e);
-                                        e.edge = particleSystem.addEdge(e.source, e.target, d);
+                            if (data.nodes) {
+                                for (var k in data.nodes) {
+                                    if (!data.nodes.hasOwnProperty(k)) continue;
+                                    var nd = data.nodes[k];
+                                    if (data.toggled) {
+                                        that.killChildren(nd.node);
+                                        particleSystem.pruneNode(nd.node);
+                                        if (!nd.click)
+                                            nd.click = {};
+                                        nd.click.toggled = false;
+                                    } else {
+                                        var dd = merge_objects(defaultNode, nd);
+                                        dd.x = nearest.node.p.x;
+                                        dd.y = nearest.node.p.y;
+                                        dd.text = k;
+                                        nd.node = particleSystem.getNode(k);
+                                        nd.node.data = dd;
                                     }
-                                });
+                                }
+                            }
+                            if (data.edges) {
+                                for (var s in data.edges) {
+                                    if (!data.edges.hasOwnProperty(s) || s == undefined) continue;
+                                    for (var t in data.edges[s]) {
+                                        if (!data.edges[s].hasOwnProperty(t) || t == undefined) continue;
+                                        var ed = data.edges[s][t];
+                                        if (data.toggled) {
+                                            particleSystem.getEdges(s, t).forEach(function (edge) {
+                                                particleSystem.pruneEdge(edge);
+                                            });
+                                        } else {
+                                            var d = merge_objects(defaultEdge, ed);
+                                            ed.edge = particleSystem.addEdge(s, t, d);
+                                        }
+                                    }
+                                }
                             }
                             data.toggled = !data.toggled;
                             e.preventDefault();
@@ -302,11 +305,11 @@ function shadeColor(color, percent) {
                         particleSystem.eachEdge(function (edge) {
                             edge.data.showText = false;
                         });
-                        if(!lastDoubleClick || (lastDoubleClick.node != nearest.node || lastDoubleClick.result == false)) {
+                        if (!lastDoubleClick || (lastDoubleClick.node != nearest.node || lastDoubleClick.result == false)) {
                             var edges = particleSystem.getEdgesFrom(nearest.node).concat(particleSystem.getEdgesTo(nearest.node));
-                            for (var i=0; i < edges.length; i++) {
+                            for (var i = 0; i < edges.length; i++) {
                                 var edge = edges[i];
-                                if(!edge.data.text) continue;
+                                if (!edge.data.text) continue;
                                 edge.data.showText = true;
                                 lastDoubleClick = {node: nearest.node, result: true};
                             }
@@ -328,7 +331,7 @@ function shadeColor(color, percent) {
 
     $(document).ready(function () {
         $.get("data/data.yml", function (data) {
-            var sys = arbor.ParticleSystem(100, 900, 0.2); // create the system with sensible repulsion/stiffness/friction
+            var sys = arbor.ParticleSystem(100, 1500, 0.2); // create the system with sensible repulsion/stiffness/friction
             sys.parameters({gravity: true}); // use center-gravity to make the graph settle nicely (ymmv)
             sys.renderer = Renderer("#viewport"); // our newly created renderer will have its .init() method called shortly by sys...;
             sys.screenSize(window.innerWidth, window.innerHeight);
