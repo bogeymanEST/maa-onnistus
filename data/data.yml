@@ -24,13 +24,14 @@ nodes:
             width: 7
             color: red
           Rebekka: {}
-          Siivert: {}
+          Siivert:
+            text: Meenutas Iisakule teda ennast.
           Eleseus: {}
           Leopoldiine: {}
           Geissler:
-            text: Geissler armastas Iisakut aidata.
-          Töö: {}
-          Talu: {}
+            text: Armastas Iisaku haruldasi isikujooni.
+          Töö:
+            text: Tunded teda ei huvitanud.
       nodes:
         Inger:
           click:
@@ -59,7 +60,10 @@ nodes:
                 Linnamood:
                   text: Peale vanglast vabanemist; hiljem vaibus.
               Eleseus:
-                Linnamood: {}
+                Siivert: {}
+                Linnamood:
+                  text: Sõitis Ameerikasse.
+                  #Kõik mis ei ole maaelu.
               Siivert:
                 Töö: {}
 
@@ -84,8 +88,6 @@ nodes:
           << : *CHILD
         Geissler: {}
         Töö: {}
-        Talu: {}
-
   Aksel:
     text: Aksel
     click: &BARBRO_CLICK

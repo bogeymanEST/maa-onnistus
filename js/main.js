@@ -139,7 +139,7 @@ function merge_objects(base, override) {
 
                 ctx.font = "10pt 'Open Sans'";
                 ctx.fillStyle = "black";
-                ctx.fillText("Right-click to explore. Drag to move nodes. Double-click to show description.", 0, 20);
+                ctx.fillText("Paremklõps avastamiseks. Lohista vasaku hiireklõpsuga, et sõlmi liigutada. Topeltklõps, et avada selgitus.", 0, 20);
 
                 particleSystem.eachEdge(function (edge, pt1, pt2) {
                     // edge: {source:Node, target:Node, length:#, data:{}}
